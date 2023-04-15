@@ -1,15 +1,17 @@
 cmake_minimum_required(VERSION 2.6)
 project(monitor)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIRS})
 
 include_directories(include)
 file(GLOB SOURCES "src/*.cpp")
+add_subdirectory(src)
 
-add_executable(monitor ${SOURCES})
-
-set_property(TARGET monitor PROPERTY CXX_STANDARD 17)
-target_link_libraries(monitor ${CURSES_LIBRARIES})
-# TODO: Run -Werror in CI.
-target_compile_options(monitor PRIVATE -Wall -Wextra)
+option(BUILD_TESTS "Build tests" OFF)
+if (BUILD_TESTS)
+  add_subdirectory(thirdparty/googletest)
+  add_subdirectory(tests)
+endif()

@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include <array>
+#include <numeric>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -113,44 +114,82 @@ long LinuxParser::UpTime(const char* info_path) {
   return uptime;
 }
 
-// TODO: Read and return the number of jiffies for the system
-long LinuxParser::Jiffies() { return 0; }
+long LinuxParser::Jiffies(const char* info_path) {
+  auto cpu_data = LinuxParser::RawCpuStat(info_path);
+  // system jiffies = sum off all jiffies
+  return std::accumulate(cpu_data.begin(), cpu_data.end(), 0);
+}
+
+std::array<long, 10> LinuxParser::RawCpuStat(const char* info_path) {
+  std::array<long, 10> cpu_data;
+  std::ifstream stream;
+  if (info_path)
+    stream.open(info_path);
+  else
+    stream.open(kProcDirectory + kStatFilename);
+  if (!stream.is_open()) return cpu_data;
+  std::string line, label;
+  std::getline(stream, line);
+  std::stringstream line_stream{line};
+  line_stream >> label;
+  for (auto& stat : cpu_data) {
+    line_stream >> stat;
+  }
+  return cpu_data;
+}
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid [[maybe_unused]]) { return 0; }
+long LinuxParser::ActiveJiffies(int pid [[maybe_unused]],
+                                const char* info_path) {
+  return 0;
+}
 
-// TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
+long LinuxParser::ActiveJiffies(const char* info_path) {
+  return Jiffies(info_path) - IdleJiffies(info_path);
+}
 
-// TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
+long LinuxParser::IdleJiffies(const char* info_path) {
+  // idle_all_time = idleTime + ioWait
+  auto cpu_data = LinuxParser::RawCpuStat(info_path);
+  return cpu_data[3] + cpu_data[4];
+}
 
 // TODO: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() { return {}; }
+vector<string> LinuxParser::CpuUtilization(const char* info_path) { return {}; }
 
 // TODO: Read and return the total number of processes
-int LinuxParser::TotalProcesses() { return 0; }
+int LinuxParser::TotalProcesses(const char* info_path) { return 0; }
 
 // TODO: Read and return the number of running processes
-int LinuxParser::RunningProcesses() { return 0; }
+int LinuxParser::RunningProcesses(const char* info_path) { return 0; }
 
 // TODO: Read and return the command associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Command(int pid [[maybe_unused]]) { return string(); }
+string LinuxParser::Command(int pid [[maybe_unused]], const char* info_path) {
+  return string();
+}
 
 // TODO: Read and return the memory used by a process
 // REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Ram(int pid [[maybe_unused]]) { return string(); }
+string LinuxParser::Ram(int pid [[maybe_unused]], const char* info_path) {
+  return string();
+}
 
 // TODO: Read and return the user ID associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Uid(int pid [[maybe_unused]]) { return string(); }
+string LinuxParser::Uid(int pid [[maybe_unused]], const char* info_path) {
+  return string();
+}
 
 // TODO: Read and return the user associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::User(int pid [[maybe_unused]]) { return string(); }
+string LinuxParser::User(int pid [[maybe_unused]], const char* info_path) {
+  return string();
+}
 
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::UpTime(int pid [[maybe_unused]]) { return 0; }
+long LinuxParser::UpTime(int pid [[maybe_unused]], const char* info_path) {
+  return 0;
+}

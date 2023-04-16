@@ -23,3 +23,15 @@ TEST(LinuxParser, MemoryUtilization) {
 TEST(LinuxParser, UptTime) {
   EXPECT_EQ(LinuxParser::UpTime("tests/assets/uptime"), 71339);
 }
+
+TEST(LinuxParser, Jiffies) {
+  EXPECT_EQ(LinuxParser::Jiffies("tests/assets/stat"), 8079402);
+}
+
+TEST(LinuxParser, ActiveJiffies) {
+  EXPECT_EQ(LinuxParser::ActiveJiffies("tests/assets/stat"), 1108906);
+}
+
+TEST(LinuxParser, IdleJiffies) {
+  EXPECT_EQ(LinuxParser::IdleJiffies("tests/assets/stat"), 6970496);
+}

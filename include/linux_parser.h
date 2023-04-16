@@ -22,10 +22,11 @@ const std::string kPasswordPath{"/etc/passwd"};
 float MemoryUtilization(const char* info_path = nullptr);
 long UpTime(const char* info_path = nullptr);
 std::vector<int> Pids();
-int TotalProcesses();
-int RunningProcesses();
+int TotalProcesses(const char* info_path = nullptr);
+int RunningProcesses(const char* info_path = nullptr);
 std::string OperatingSystem(const char* info_path = nullptr);
 std::string Kernel(const char* info_path = nullptr);
+std::array<long, 10> RawCpuStat(const char* info_path = nullptr);
 
 // CPU
 enum CPUStates {
@@ -40,18 +41,18 @@ enum CPUStates {
   kGuest_,
   kGuestNice_
 };
-std::vector<std::string> CpuUtilization();
-long Jiffies();
-long ActiveJiffies();
-long ActiveJiffies(int pid);
-long IdleJiffies();
+std::vector<std::string> CpuUtilization(const char* info_path = nullptr);
+long Jiffies(const char* info_path = nullptr);
+long ActiveJiffies(const char* info_path = nullptr);
+long ActiveJiffies(int pid, const char* info_path = nullptr);
+long IdleJiffies(const char* info_path = nullptr);
 
 // Processes
-std::string Command(int pid);
-std::string Ram(int pid);
-std::string Uid(int pid);
-std::string User(int pid);
-long int UpTime(int pid);
+std::string Command(int pid, const char* info_path = nullptr);
+std::string Ram(int pid, const char* info_path = nullptr);
+std::string Uid(int pid, const char *info_path = nullptr);
+std::string User(int pid, const char* info_path = nullptr);
+long int UpTime(int pid, const char* info_path = nullptr);
 };  // namespace LinuxParser
 
 #endif

@@ -20,7 +20,7 @@ const std::string kPasswordPath{"/etc/passwd"};
 
 // System
 float MemoryUtilization(const char* info_path = nullptr);
-long UpTime();
+long UpTime(const char* info_path = nullptr);
 std::vector<int> Pids();
 int TotalProcesses();
 int RunningProcesses();

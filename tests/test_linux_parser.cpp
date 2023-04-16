@@ -19,3 +19,7 @@ TEST(LinuxParser, MemoryUtilization) {
   EXPECT_NEAR(LinuxParser::MemoryUtilization("tests/assets/meminfo"), 0.4817,
               0.0001);
 }
+
+TEST(LinuxParser, UptTime) {
+  EXPECT_EQ(LinuxParser::UpTime("tests/assets/uptime"), 71339);
+}

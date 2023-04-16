@@ -3,6 +3,7 @@
 #include <dirent.h>
 #include <unistd.h>
 
+#include <array>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -13,11 +14,16 @@ using std::to_string;
 using std::vector;
 
 // DONE: An example of how to read data from the filesystem
-string LinuxParser::OperatingSystem() {
+string LinuxParser::OperatingSystem(const char* info_path) {
   string line;
   string key;
   string value;
-  std::ifstream filestream(kOSPath);
+  std::ifstream filestream;
+  if (info_path)
+    filestream.open(info_path);
+  else
+    filestream.open(kOSPath);
+
   if (filestream.is_open()) {
     while (std::getline(filestream, line)) {
       std::replace(line.begin(), line.end(), ' ', '_');
@@ -36,10 +42,14 @@ string LinuxParser::OperatingSystem() {
 }
 
 // DONE: An example of how to read data from the filesystem
-string LinuxParser::Kernel() {
+string LinuxParser::Kernel(const char* info_path) {
   string os, kernel, version;
   string line;
-  std::ifstream stream(kProcDirectory + kVersionFilename);
+  std::ifstream stream;
+  if (info_path)
+    stream.open(info_path);
+  else
+    stream.open(kProcDirectory + kVersionFilename);
   if (stream.is_open()) {
     std::getline(stream, line);
     std::istringstream linestream(line);
@@ -68,8 +78,24 @@ vector<int> LinuxParser::Pids() {
   return pids;
 }
 
-// TODO: Read and return the system memory utilization
-float LinuxParser::MemoryUtilization() { return 0.0; }
+float LinuxParser::MemoryUtilization(const char* info_path) {
+  std::ifstream stream;
+  if (info_path)
+    stream.open(info_path);
+  else
+    stream.open(kProcDirectory + kMeminfoFilename);
+  if (!stream.is_open()) return 0.0;
+  std::string line, label;
+  std::array<float, 5> values;
+
+  for (auto& value : values) {
+    std::getline(stream, line);
+    std::stringstream line_stream{line};
+    line_stream >> label >> value;
+  }
+  auto [mem_total, mem_free, mem_available, buffers, cached] = values;
+  return (mem_total - mem_free - buffers - cached) / mem_total;
+}
 
 // TODO: Read and return the system uptime
 long LinuxParser::UpTime() { return 0; }

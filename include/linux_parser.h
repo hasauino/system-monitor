@@ -19,13 +19,13 @@ const std::string kOSPath{"/etc/os-release"};
 const std::string kPasswordPath{"/etc/passwd"};
 
 // System
-float MemoryUtilization();
+float MemoryUtilization(const char* info_path = nullptr);
 long UpTime();
 std::vector<int> Pids();
 int TotalProcesses();
 int RunningProcesses();
-std::string OperatingSystem();
-std::string Kernel();
+std::string OperatingSystem(const char* info_path = nullptr);
+std::string Kernel(const char* info_path = nullptr);
 
 // CPU
 enum CPUStates {

@@ -40,7 +40,6 @@ enum CPUStates {
   kGuest_,
   kGuestNice_
 };
-std::vector<std::string> CpuUtilization(const char* info_path = nullptr);
 long Jiffies(const char* info_path = nullptr);
 long ActiveJiffies(const char* info_path = nullptr);
 long ActiveJiffies(int pid, const char* info_path = nullptr);

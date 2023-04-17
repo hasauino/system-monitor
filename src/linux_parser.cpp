@@ -152,11 +152,8 @@ long LinuxParser::ActiveJiffies(const char* info_path) {
 long LinuxParser::IdleJiffies(const char* info_path) {
   // idle_all_time = idleTime + ioWait
   auto cpu_data = LinuxParser::RawCpuStat(info_path);
-  return cpu_data[3] + cpu_data[4];
+  return cpu_data[kIdle_] + cpu_data[kIOwait_];
 }
-
-// TODO: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization(const char* info_path) { return {}; }
 
 int LinuxParser::TotalProcesses(const char* info_path) {
   auto path = (info_path == nullptr) ? (kProcDirectory + kStatFilename)

@@ -26,7 +26,6 @@ int TotalProcesses(const char* info_path = nullptr);
 int RunningProcesses(const char* info_path = nullptr);
 std::string OperatingSystem(const char* info_path = nullptr);
 std::string Kernel(const char* info_path = nullptr);
-std::array<long, 10> RawCpuStat(const char* info_path = nullptr);
 
 // CPU
 enum CPUStates {
@@ -50,9 +49,14 @@ long IdleJiffies(const char* info_path = nullptr);
 // Processes
 std::string Command(int pid, const char* info_path = nullptr);
 std::string Ram(int pid, const char* info_path = nullptr);
-std::string Uid(int pid, const char *info_path = nullptr);
+std::string Uid(int pid, const char* info_path = nullptr);
 std::string User(int pid, const char* info_path = nullptr);
 long int UpTime(int pid, const char* info_path = nullptr);
+
+// Helpers
+std::array<long, 10> RawCpuStat(const char* info_path = nullptr);
+template <typename T>
+T ScanAndGet(const std::string& info_path, const std::string& key, int offset = 1);
 };  // namespace LinuxParser
 
 #endif

@@ -35,3 +35,11 @@ TEST(LinuxParser, ActiveJiffies) {
 TEST(LinuxParser, IdleJiffies) {
   EXPECT_EQ(LinuxParser::IdleJiffies("tests/assets/stat"), 6970496);
 }
+
+TEST(LinuxParser, TotalProcesses) {
+  EXPECT_EQ(LinuxParser::TotalProcesses("tests/assets/stat"), 97366);
+}
+
+TEST(LinuxParser, RunningProcesses) {
+  EXPECT_EQ(LinuxParser::RunningProcesses("tests/assets/stat"), 1);
+}

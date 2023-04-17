@@ -27,7 +27,7 @@ test: thirdparty/googletest/CMakeLists.txt
 debug:
 	mkdir -p build
 	cd build && \
-	cmake -DCMAKE_BUILD_TYPE=debug .. && \
+	cmake -DCMAKE_BUILD_TYPE=debug -DBUILD_TESTS=ON .. && \
 	make
 
 .PHONY: clean

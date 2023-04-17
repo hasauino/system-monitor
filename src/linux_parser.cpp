@@ -158,11 +158,17 @@ long LinuxParser::IdleJiffies(const char* info_path) {
 // TODO: Read and return CPU utilization
 vector<string> LinuxParser::CpuUtilization(const char* info_path) { return {}; }
 
-// TODO: Read and return the total number of processes
-int LinuxParser::TotalProcesses(const char* info_path) { return 0; }
+int LinuxParser::TotalProcesses(const char* info_path) {
+  auto path = (info_path == nullptr) ? (kProcDirectory + kStatFilename)
+                                     : std::string{info_path};
+  return ScanAndGet<int>(path, "processes");
+}
 
-// TODO: Read and return the number of running processes
-int LinuxParser::RunningProcesses(const char* info_path) { return 0; }
+int LinuxParser::RunningProcesses(const char* info_path) {
+  auto path = (info_path == nullptr) ? (kProcDirectory + kStatFilename)
+                                     : std::string{info_path};
+  return ScanAndGet<int>(path, "procs_running");
+}
 
 // TODO: Read and return the command associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
@@ -192,4 +198,22 @@ string LinuxParser::User(int pid [[maybe_unused]], const char* info_path) {
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::UpTime(int pid [[maybe_unused]], const char* info_path) {
   return 0;
+}
+
+template <typename T>
+T LinuxParser::ScanAndGet(const std::string& info_path, const std::string& key,
+                          int offset) {
+  std::ifstream stream{info_path};
+  if (!stream.is_open()) return T();
+  std::string label;
+  T value;
+  for (std::string label; stream >> label;) {
+    if (label == key) {
+      for (int i = 0; i < offset; i++) {
+        stream >> value;
+      }
+      return value;
+    }
+  }
+  return T();
 }

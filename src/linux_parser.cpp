@@ -60,9 +60,14 @@ string LinuxParser::Kernel(const char* info_path) {
 }
 
 // BONUS: Update this to use std::filesystem
-vector<int> LinuxParser::Pids() {
+vector<int> LinuxParser::Pids(const char* info_path) {
   vector<int> pids;
-  DIR* directory = opendir(kProcDirectory.c_str());
+  DIR* directory;
+  if (info_path)
+    directory = opendir(info_path);
+  else
+    directory = opendir(kProcDirectory.c_str());
+
   struct dirent* file;
   while ((file = readdir(directory)) != nullptr) {
     // Is this a directory?
@@ -167,10 +172,17 @@ int LinuxParser::RunningProcesses(const char* info_path) {
   return ScanAndGet<int>(path, "procs_running");
 }
 
-// TODO: Read and return the command associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Command(int pid [[maybe_unused]], const char* info_path) {
-  return string();
+string LinuxParser::Command(int pid, const char* info_path) {
+  std::ifstream file;
+  std::string cmd_file_path = std::to_string(pid) + kCmdlineFilename;
+  if (info_path)
+    file.open(std::string{info_path} + cmd_file_path);
+  else
+    file.open(kProcDirectory + cmd_file_path);
+  if (!file.is_open()) return string();
+  std::string command;
+  file >> command;
+  return command;
 }
 
 // TODO: Read and return the memory used by a process

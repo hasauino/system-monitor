@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <vector>
 
 #include "linux_parser.h"
 
@@ -42,4 +43,14 @@ TEST(LinuxParser, TotalProcesses) {
 
 TEST(LinuxParser, RunningProcesses) {
   EXPECT_EQ(LinuxParser::RunningProcesses("tests/assets/stat"), 1);
+}
+
+TEST(LinuxParser, Pids) {
+  std::vector expected{12944, 56230};
+  EXPECT_EQ(LinuxParser::Pids("tests/assets/processes/"), expected);
+}
+
+TEST(LinuxParser, Command) {
+  EXPECT_EQ(LinuxParser::Command(12944, "tests/assets/processes/"),
+            "/usr/bin/nautilus\0--gapplication-service\0");
 }

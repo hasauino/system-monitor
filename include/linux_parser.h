@@ -2,6 +2,7 @@
 #define SYSTEM_PARSER_H
 
 #include <fstream>
+#include <optional>
 #include <regex>
 #include <string>
 
@@ -48,14 +49,15 @@ long IdleJiffies(const char* info_path = nullptr);
 // Processes
 std::string Command(int pid, const char* info_path = nullptr);
 std::string Ram(int pid, const char* info_path = nullptr);
-std::string Uid(int pid, const char* info_path = nullptr);
-std::string User(int pid, const char* info_path = nullptr);
+std::string User(int pid, const char* proc_path = nullptr,
+                const char* passwd_path = nullptr);
 long int UpTime(int pid, const char* info_path = nullptr);
 
 // Helpers
 std::array<long, 10> RawCpuStat(const char* info_path = nullptr);
 template <typename T>
-T ScanAndGet(const std::string& info_path, const std::string& key, int offset = 1);
+std::optional<T> ScanAndGet(const std::string& info_path,
+                            const std::string& key, int offset = 1);
 };  // namespace LinuxParser
 
 #endif

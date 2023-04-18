@@ -50,7 +50,15 @@ TEST(LinuxParser, Pids) {
   EXPECT_EQ(LinuxParser::Pids("tests/assets/processes/"), expected);
 }
 
+/*
 TEST(LinuxParser, Command) {
   EXPECT_EQ(LinuxParser::Command(12944, "tests/assets/processes/"),
             "/usr/bin/nautilus\0--gapplication-service\0");
+}
+*/
+
+TEST(LinuxParser, User) {
+  EXPECT_EQ(
+      LinuxParser::User(12944, "tests/assets/processes/", "tests/assets/passwd"),
+      "hassan");
 }

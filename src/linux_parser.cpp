@@ -5,6 +5,7 @@
 
 #include <array>
 #include <numeric>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -163,13 +164,15 @@ long LinuxParser::IdleJiffies(const char* info_path) {
 int LinuxParser::TotalProcesses(const char* info_path) {
   auto path = (info_path == nullptr) ? (kProcDirectory + kStatFilename)
                                      : std::string{info_path};
-  return ScanAndGet<int>(path, "processes");
+  auto processes = ScanAndGet<int>(path, "processes");
+  return (processes.has_value()) ? processes.value() : 0;
 }
 
 int LinuxParser::RunningProcesses(const char* info_path) {
   auto path = (info_path == nullptr) ? (kProcDirectory + kStatFilename)
                                      : std::string{info_path};
-  return ScanAndGet<int>(path, "procs_running");
+  auto processes = ScanAndGet<int>(path, "procs_running");
+  return (processes.has_value()) ? processes.value() : 0;
 }
 
 string LinuxParser::Command(int pid, const char* info_path) {
@@ -191,15 +194,34 @@ string LinuxParser::Ram(int pid [[maybe_unused]], const char* info_path) {
   return string();
 }
 
-// TODO: Read and return the user ID associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Uid(int pid [[maybe_unused]], const char* info_path) {
-  return string();
-}
-
-// TODO: Read and return the user associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::User(int pid [[maybe_unused]], const char* info_path) {
+string LinuxParser::User(int pid, const char* proc_path,
+                         const char* passwd_path) {
+  std::ifstream file;
+  std::string stat_file_path;
+  if (proc_path)
+    stat_file_path = proc_path;
+  else
+    stat_file_path = kProcDirectory;
+  stat_file_path = stat_file_path + std::to_string(pid) + kStatusFilename;
+  auto uid = ScanAndGet<int>(stat_file_path, "Uid:");
+  file.close();
+  if (!uid.has_value()) return string();
+  std::ifstream passwd_file;
+  if (passwd_path)
+    passwd_file.open(passwd_path);
+  else
+    passwd_file.open(kPasswordPath);
+  if (!passwd_file.is_open()) return string();
+  std::string line;
+  std::stringstream line_stream;
+  std::string user_name, x;
+  int user_id;
+  while (std::getline(passwd_file, line)) {
+    std::replace(line.begin(), line.end(), ':', ' ');
+    line_stream.str(line);
+    line_stream >> user_name >> x >> user_id;
+    if (user_id == uid.value()) return user_name;
+  }
   return string();
 }
 
@@ -210,10 +232,10 @@ long LinuxParser::UpTime(int pid [[maybe_unused]], const char* info_path) {
 }
 
 template <typename T>
-T LinuxParser::ScanAndGet(const std::string& info_path, const std::string& key,
-                          int offset) {
+std::optional<T> LinuxParser::ScanAndGet(const std::string& info_path,
+                                         const std::string& key, int offset) {
   std::ifstream stream{info_path};
-  if (!stream.is_open()) return T();
+  if (!stream.is_open()) return std::nullopt;
   std::string label;
   T value;
   for (std::string label; stream >> label;) {
@@ -224,5 +246,5 @@ T LinuxParser::ScanAndGet(const std::string& info_path, const std::string& key,
       return value;
     }
   }
-  return T();
+  return std::nullopt;
 }

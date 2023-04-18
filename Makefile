@@ -1,9 +1,10 @@
 .PHONY: all
-all: format test build
+all: format build
 
 .PHONY: format
 format:
-	clang-format src/* include/* -i
+	clang-format src/*.cpp include/* -i
+	clang-format tests/*.cpp include/* -i
 
 .PHONY: build
 build:
@@ -12,11 +13,21 @@ build:
 	cmake .. && \
 	make
 
+thirdparty/googletest/CMakeLists.txt:
+	git submodule update --init --recursive
+
+.PHONY: test
+test: thirdparty/googletest/CMakeLists.txt
+	mkdir -p build
+	cd build && \
+	cmake -DBUILD_TESTS=ON .. && \
+	make
+
 .PHONY: debug
 debug:
 	mkdir -p build
 	cd build && \
-	cmake -DCMAKE_BUILD_TYPE=debug .. && \
+	cmake -DCMAKE_BUILD_TYPE=debug -DBUILD_TESTS=ON .. && \
 	make
 
 .PHONY: clean

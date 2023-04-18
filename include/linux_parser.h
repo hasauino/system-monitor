@@ -2,6 +2,7 @@
 #define SYSTEM_PARSER_H
 
 #include <fstream>
+#include <optional>
 #include <regex>
 #include <string>
 
@@ -19,13 +20,13 @@ const std::string kOSPath{"/etc/os-release"};
 const std::string kPasswordPath{"/etc/passwd"};
 
 // System
-float MemoryUtilization();
-long UpTime();
-std::vector<int> Pids();
-int TotalProcesses();
-int RunningProcesses();
-std::string OperatingSystem();
-std::string Kernel();
+float MemoryUtilization(const char* info_path = nullptr);
+long UpTime(const char* info_path = nullptr);
+std::vector<int> Pids(const char* info_path = nullptr);
+int TotalProcesses(const char* info_path = nullptr);
+int RunningProcesses(const char* info_path = nullptr);
+std::string OperatingSystem(const char* info_path = nullptr);
+std::string Kernel(const char* info_path = nullptr);
 
 // CPU
 enum CPUStates {
@@ -40,18 +41,24 @@ enum CPUStates {
   kGuest_,
   kGuestNice_
 };
-std::vector<std::string> CpuUtilization();
-long Jiffies();
-long ActiveJiffies();
-long ActiveJiffies(int pid);
-long IdleJiffies();
+long Jiffies(const char* info_path = nullptr);
+long ActiveJiffies(const char* info_path = nullptr);
+long ActiveJiffies(int pid, const char* info_path = nullptr);
+long IdleJiffies(const char* info_path = nullptr);
 
 // Processes
-std::string Command(int pid);
-std::string Ram(int pid);
-std::string Uid(int pid);
-std::string User(int pid);
-long int UpTime(int pid);
+std::string Command(int pid, const char* info_path = nullptr);
+std::string Ram(int pid, const char* info_path = nullptr);
+std::string User(int pid, const char* proc_path = nullptr,
+                 const char* passwd_path = nullptr);
+long int UpTime(int pid, const char* info_path = nullptr,
+                const char* uptime_path = nullptr);
+
+// Helpers
+std::array<long, 10> RawCpuStat(const char* info_path = nullptr);
+template <typename T>
+std::optional<T> ScanAndGet(const std::string& info_path,
+                            const std::string& key, int offset = 1);
 };  // namespace LinuxParser
 
 #endif

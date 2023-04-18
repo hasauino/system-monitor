@@ -68,5 +68,11 @@ TEST(LinuxParser, Ram) {
 }
 
 TEST(LinuxParser, UpTime) {
-  EXPECT_EQ(LinuxParser::UpTime(12944, "tests/assets/processes/", "tests/assets/uptime"), 64381);
+  EXPECT_EQ(LinuxParser::UpTime(12944, "tests/assets/processes/",
+                                "tests/assets/uptime"),
+            64381);
+}
+
+TEST(LinuxParser, ProcessActiveJiffies) {
+  EXPECT_EQ(LinuxParser::ActiveJiffies(12944, "tests/assets/processes/"), 1820);
 }

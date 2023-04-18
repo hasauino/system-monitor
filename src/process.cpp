@@ -15,24 +15,22 @@ using std::vector;
 
 Process::Process(int id) : id_{id} {}
 
-int Process::Pid() { return id_; }
+int Process::Pid() const { return id_; }
 
-float Process::CpuUtilization() {
+float Process::CpuUtilization() const {
   auto total = LinuxParser::UpTime(Pid());
   auto active = LinuxParser::ActiveJiffies(Pid()) / sysconf(_SC_CLK_TCK);
   return static_cast<float>(active) / total;
 }
 
-string Process::Command() { return LinuxParser::Command(Pid()); }
+string Process::Command() const { return LinuxParser::Command(Pid()); }
 
-string Process::Ram() { return LinuxParser::Ram(Pid()); }
+string Process::Ram() const { return LinuxParser::Ram(Pid()); }
 
-string Process::User() { return LinuxParser::User(Pid()); }
+string Process::User() const { return LinuxParser::User(Pid()); }
 
-long int Process::UpTime() { return LinuxParser::UpTime(Pid()); }
+long int Process::UpTime() const { return LinuxParser::UpTime(Pid()); }
 
-// TODO: Overload the "less than" comparison operator for Process objects
-// REMOVE: [[maybe_unused]] once you define the function
-bool Process::operator<(Process const& a [[maybe_unused]]) const {
-  return true;
+bool Process::operator<(Process const& a) const {
+  return CpuUtilization() >= a.CpuUtilization();
 }

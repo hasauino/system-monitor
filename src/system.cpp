@@ -2,6 +2,7 @@
 
 #include <unistd.h>
 
+#include <algorithm>
 #include <cstddef>
 #include <set>
 #include <string>
@@ -31,6 +32,7 @@ vector<Process>& System::Processes() {
   for (auto pid : LinuxParser::Pids()) {
     processes_.push_back(Process(pid));
   }
+  std::sort(processes_.begin(), processes_.end());
   return processes_;
 }
 

@@ -234,10 +234,22 @@ string LinuxParser::User(int pid, const char* proc_path,
   return string();
 }
 
-// TODO: Read and return the uptime of a process
-// REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::UpTime(int pid [[maybe_unused]], const char* info_path) {
-  return 0;
+long LinuxParser::UpTime(int pid [[maybe_unused]], const char* stat_root, const char* uptime_path) {
+  std::ifstream file;
+  std::string stat_file_path;
+  if (stat_root)
+    stat_file_path = stat_root;
+  else
+    stat_file_path = kProcDirectory;
+  stat_file_path = stat_file_path + std::to_string(pid) + kStatFilename;
+  file.open(stat_file_path);
+  if (!file.is_open()) return 0;
+  std::string value;
+  for (int i = 0; i < 22; i++) {
+    file >> value;
+  }
+  auto start_time = std::stof(value) / sysconf(_SC_CLK_TCK);
+  return UpTime(uptime_path) - start_time;
 }
 
 template <typename T>

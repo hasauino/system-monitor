@@ -50,8 +50,9 @@ long IdleJiffies(const char* info_path = nullptr);
 std::string Command(int pid, const char* info_path = nullptr);
 std::string Ram(int pid, const char* info_path = nullptr);
 std::string User(int pid, const char* proc_path = nullptr,
-                const char* passwd_path = nullptr);
-long int UpTime(int pid, const char* info_path = nullptr);
+                 const char* passwd_path = nullptr);
+long int UpTime(int pid, const char* info_path = nullptr,
+                const char* uptime_path = nullptr);
 
 // Helpers
 std::array<long, 10> RawCpuStat(const char* info_path = nullptr);

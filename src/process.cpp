@@ -17,8 +17,11 @@ Process::Process(int id) : id_{id} {}
 
 int Process::Pid() { return id_; }
 
-// TODO: Return this process's CPU utilization
-float Process::CpuUtilization() { return 0; }
+float Process::CpuUtilization() {
+  auto total = LinuxParser::UpTime(Pid());
+  auto active = LinuxParser::ActiveJiffies(Pid()) / sysconf(_SC_CLK_TCK);
+  return static_cast<float>(active) / total;
+}
 
 string Process::Command() { return LinuxParser::Command(Pid()); }
 

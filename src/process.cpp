@@ -31,6 +31,8 @@ string Process::User() const { return LinuxParser::User(Pid()); }
 
 long int Process::UpTime() const { return LinuxParser::UpTime(Pid()); }
 
-bool Process::operator<(Process const& a) const {
-  return CpuUtilization() >= a.CpuUtilization();
+int Process::operator<=>(Process const& a) const {
+  auto p1 = CpuUtilization();
+  auto p2 = a.CpuUtilization();
+  return p1 == p2 ? 0 : p1 < p2 ? -1 : 1;
 }

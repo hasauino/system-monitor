@@ -25,7 +25,7 @@ vector<Process>& System::Processes() {
     processes_.push_back(Process(pid));
   }
   std::partial_sort(processes_.begin(), processes_.begin() + 10,
-                    processes_.end());
+                    processes_.end(), std::greater<Process>());
   return processes_;
 }
 

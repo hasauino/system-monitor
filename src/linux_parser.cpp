@@ -188,10 +188,19 @@ string LinuxParser::Command(int pid, const char* info_path) {
   return command;
 }
 
-// TODO: Read and return the memory used by a process
-// REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::Ram(int pid [[maybe_unused]], const char* info_path) {
-  return string();
+  std::ifstream file;
+  std::string stat_file_path;
+  if (info_path)
+    stat_file_path = info_path;
+  else
+    stat_file_path = kProcDirectory;
+  stat_file_path = stat_file_path + std::to_string(pid) + kStatusFilename;
+  auto vm_size = ScanAndGet<int>(stat_file_path, "VmSize:");
+  file.close();
+  if (!vm_size.has_value()) return string();
+  auto ram = vm_size.value() / 1024;
+  return std::to_string(ram);
 }
 
 string LinuxParser::User(int pid, const char* proc_path,

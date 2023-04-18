@@ -58,7 +58,11 @@ TEST(LinuxParser, Command) {
 */
 
 TEST(LinuxParser, User) {
-  EXPECT_EQ(
-      LinuxParser::User(12944, "tests/assets/processes/", "tests/assets/passwd"),
-      "hassan");
+  EXPECT_EQ(LinuxParser::User(12944, "tests/assets/processes/",
+                              "tests/assets/passwd"),
+            "hassan");
+}
+
+TEST(LinuxParser, Ram) {
+  EXPECT_EQ(LinuxParser::Ram(12944, "tests/assets/processes/"), "1261");
 }

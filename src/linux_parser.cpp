@@ -210,7 +210,12 @@ string LinuxParser::Ram(int pid [[maybe_unused]], const char* info_path) {
   else
     stat_file_path = kProcDirectory;
   stat_file_path = stat_file_path + std::to_string(pid) + kStatusFilename;
-  auto vm_size = ScanAndGet<int>(stat_file_path, "VmSize:");
+
+  // Here I used VmRSS instead of VmSize to get usage of the 
+  // phyiscal memory only as suggested by the reviewer.
+  // It actually made things better, as I was getting Ram values
+  // higher than my physical memory when I used VmSize
+  auto vm_size = ScanAndGet<int>(stat_file_path, "VmRSS:");
   if (!vm_size.has_value()) return string();
   auto ram = vm_size.value() / 1024;
   return std::to_string(ram);

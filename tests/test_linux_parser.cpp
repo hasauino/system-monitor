@@ -64,7 +64,7 @@ TEST(LinuxParser, User) {
 }
 
 TEST(LinuxParser, Ram) {
-  EXPECT_EQ(LinuxParser::Ram(12944, "tests/assets/processes/"), "1261");
+  EXPECT_EQ(LinuxParser::Ram(12944, "tests/assets/processes/"), "74");
 }
 
 TEST(LinuxParser, UpTime) {

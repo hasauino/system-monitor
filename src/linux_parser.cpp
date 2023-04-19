@@ -39,6 +39,7 @@ string LinuxParser::OperatingSystem(const char* info_path) {
         }
       }
     }
+    filestream.close();
   }
   return value;
 }
@@ -57,6 +58,7 @@ string LinuxParser::Kernel(const char* info_path) {
     std::istringstream linestream(line);
     linestream >> os >> version >> kernel;
   }
+  stream.close();
   return kernel;
 }
 
@@ -100,6 +102,7 @@ float LinuxParser::MemoryUtilization(const char* info_path) {
     std::stringstream line_stream{line};
     line_stream >> label >> value;
   }
+  stream.close();
   auto [mem_total, mem_free, mem_available, buffers, cached] = values;
   return (mem_total - mem_free - buffers - cached) / mem_total;
 }
@@ -115,6 +118,7 @@ long LinuxParser::UpTime(const char* info_path) {
   long uptime;
 
   std::getline(stream, line);
+  stream.close();
   std::stringstream line_stream{line};
   line_stream >> uptime;
   return uptime;
@@ -136,6 +140,7 @@ std::array<long, 10> LinuxParser::RawCpuStat(const char* info_path) {
   if (!stream.is_open()) return cpu_data;
   std::string line, label;
   std::getline(stream, line);
+  stream.close();
   std::stringstream line_stream{line};
   line_stream >> label;
   for (auto& stat : cpu_data) {
@@ -156,6 +161,7 @@ long LinuxParser::ActiveJiffies(int pid, const char* info_path) {
   for (int i = 0; i < 13; i++) file >> dummy;
   long utime, stime;
   file >> utime >> stime;
+  file.close();
   return utime + stime;
 }
 
@@ -193,11 +199,11 @@ string LinuxParser::Command(int pid, const char* info_path) {
   if (!file.is_open()) return string();
   std::string command;
   file >> command;
+  file.close();
   return command;
 }
 
 string LinuxParser::Ram(int pid [[maybe_unused]], const char* info_path) {
-  std::ifstream file;
   std::string stat_file_path;
   if (info_path)
     stat_file_path = info_path;
@@ -205,7 +211,6 @@ string LinuxParser::Ram(int pid [[maybe_unused]], const char* info_path) {
     stat_file_path = kProcDirectory;
   stat_file_path = stat_file_path + std::to_string(pid) + kStatusFilename;
   auto vm_size = ScanAndGet<int>(stat_file_path, "VmSize:");
-  file.close();
   if (!vm_size.has_value()) return string();
   auto ram = vm_size.value() / 1024;
   return std::to_string(ram);
@@ -213,7 +218,6 @@ string LinuxParser::Ram(int pid [[maybe_unused]], const char* info_path) {
 
 string LinuxParser::User(int pid, const char* proc_path,
                          const char* passwd_path) {
-  std::ifstream file;
   std::string stat_file_path;
   if (proc_path)
     stat_file_path = proc_path;
@@ -221,7 +225,6 @@ string LinuxParser::User(int pid, const char* proc_path,
     stat_file_path = kProcDirectory;
   stat_file_path = stat_file_path + std::to_string(pid) + kStatusFilename;
   auto uid = ScanAndGet<int>(stat_file_path, "Uid:");
-  file.close();
   if (!uid.has_value()) return string();
   std::ifstream passwd_file;
   if (passwd_path)
@@ -239,6 +242,7 @@ string LinuxParser::User(int pid, const char* proc_path,
     line_stream >> user_name >> x >> user_id;
     if (user_id == uid.value()) return user_name;
   }
+  passwd_file.close();
   return string();
 }
 
@@ -257,6 +261,7 @@ long LinuxParser::UpTime(int pid [[maybe_unused]], const char* stat_root,
   for (int i = 0; i < 22; i++) {
     file >> value;
   }
+  file.close();
   auto start_time = std::stof(value) / sysconf(_SC_CLK_TCK);
   return UpTime(uptime_path) - start_time;
 }
@@ -276,5 +281,6 @@ std::optional<T> LinuxParser::ScanAndGet(const std::string& info_path,
       return value;
     }
   }
+  stream.close();
   return std::nullopt;
 }

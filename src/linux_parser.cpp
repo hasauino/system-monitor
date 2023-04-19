@@ -33,7 +33,7 @@ string LinuxParser::OperatingSystem(const char* info_path) {
       std::replace(line.begin(), line.end(), '"', ' ');
       std::istringstream linestream(line);
       while (linestream >> key >> value) {
-        if (key == "PRETTY_NAME") {
+        if (key == kPrettyName) {
           std::replace(value.begin(), value.end(), '_', ' ');
           return value;
         }
@@ -178,14 +178,14 @@ long LinuxParser::IdleJiffies(const char* info_path) {
 int LinuxParser::TotalProcesses(const char* info_path) {
   auto path = (info_path == nullptr) ? (kProcDirectory + kStatFilename)
                                      : std::string{info_path};
-  auto processes = ScanAndGet<int>(path, "processes");
+  auto processes = ScanAndGet<int>(path, kProcesses);
   return (processes.has_value()) ? processes.value() : 0;
 }
 
 int LinuxParser::RunningProcesses(const char* info_path) {
   auto path = (info_path == nullptr) ? (kProcDirectory + kStatFilename)
                                      : std::string{info_path};
-  auto processes = ScanAndGet<int>(path, "procs_running");
+  auto processes = ScanAndGet<int>(path, kRunningProcesses);
   return (processes.has_value()) ? processes.value() : 0;
 }
 
@@ -200,7 +200,7 @@ string LinuxParser::Command(int pid, const char* info_path) {
   std::string command;
   file >> command;
   file.close();
-  return command;
+  return TrimText(command);
 }
 
 string LinuxParser::Ram(int pid [[maybe_unused]], const char* info_path) {
@@ -211,11 +211,11 @@ string LinuxParser::Ram(int pid [[maybe_unused]], const char* info_path) {
     stat_file_path = kProcDirectory;
   stat_file_path = stat_file_path + std::to_string(pid) + kStatusFilename;
 
-  // Here I used VmRSS instead of VmSize to get usage of the 
+  // Here I used VmRSS instead of VmSize to get usage of the
   // phyiscal memory only as suggested by the reviewer.
   // It actually made things better, as I was getting Ram values
   // higher than my physical memory when I used VmSize
-  auto vm_size = ScanAndGet<int>(stat_file_path, "VmRSS:");
+  auto vm_size = ScanAndGet<int>(stat_file_path, kVmRSS);
   if (!vm_size.has_value()) return string();
   auto ram = vm_size.value() / 1024;
   return std::to_string(ram);
@@ -229,7 +229,7 @@ string LinuxParser::User(int pid, const char* proc_path,
   else
     stat_file_path = kProcDirectory;
   stat_file_path = stat_file_path + std::to_string(pid) + kStatusFilename;
-  auto uid = ScanAndGet<int>(stat_file_path, "Uid:");
+  auto uid = ScanAndGet<int>(stat_file_path, kUid);
   if (!uid.has_value()) return string();
   std::ifstream passwd_file;
   if (passwd_path)
@@ -288,4 +288,9 @@ std::optional<T> LinuxParser::ScanAndGet(const std::string& info_path,
   }
   stream.close();
   return std::nullopt;
+}
+
+std::string LinuxParser::TrimText(const std::string& text, std::size_t max_length) {
+  if (text.size() <= max_length) return text;
+  return text.substr(0, max_length) + "...";
 }

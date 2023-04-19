@@ -18,6 +18,12 @@ const std::string kMeminfoFilename{"/meminfo"};
 const std::string kVersionFilename{"/version"};
 const std::string kOSPath{"/etc/os-release"};
 const std::string kPasswordPath{"/etc/passwd"};
+const std::string kVmRSS{"VmRSS:"};
+const std::string kUid{"Uid:"};
+const std::string kProcesses{"processes"};
+const std::string kRunningProcesses{"procs_running"};
+const std::string kPrettyName{"PRETTY_NAME"};
+const std::size_t kStringTrimThreshold{40};
 
 // System
 float MemoryUtilization(const char* info_path = nullptr);
@@ -59,6 +65,8 @@ std::array<long, 10> RawCpuStat(const char* info_path = nullptr);
 template <typename T>
 std::optional<T> ScanAndGet(const std::string& info_path,
                             const std::string& key, int offset = 1);
+std::string TrimText(const std::string& text,
+                     std::size_t max_length = kStringTrimThreshold);
 };  // namespace LinuxParser
 
 #endif

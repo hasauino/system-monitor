@@ -76,3 +76,7 @@ TEST(LinuxParser, UpTime) {
 TEST(LinuxParser, ProcessActiveJiffies) {
   EXPECT_EQ(LinuxParser::ActiveJiffies(12944, "tests/assets/processes/"), 1820);
 }
+
+TEST(LinuxParser, TrimText) {
+  EXPECT_EQ(LinuxParser::TrimText("123456789", 5), "12345...");
+}
